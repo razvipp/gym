@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planer Antrenament</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --warning: #fca311;
+            --danger: #e63946;
+            --chest: #ff6b6b;
+            --back: #4ecdc4;
+            --legs: #1a936f;
+            --shoulders: #ffd166;
+            --arms: #f28482;
+            --cardio: #9d4edd;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7ff;
+            color: var(--dark);
+            padding-bottom: 80px;
+        }
+
+        .container {
+            max-width: 100%;
+            padding: 0 15px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .week-navigation {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 20px 0;
+            background-color: white;
+            border-radius: 12px;
+            padding: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .arrow {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--primary);
+            cursor: pointer;
+            padding: 5px 15px;
+        }
+
+        .current-week {
+            font-weight: bold;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .day-tabs {
+            display: flex;
+            overflow-x: auto;
+            margin-bottom: 20px;
+            background-color: white;
+            border-radius: 12px;
+            padding: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .day-tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px 5px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            min-width: 70px;
+        }
+
+        .day-tab.active {
+            border-bottom: 3px solid var(--primary);
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .exercises-container {
+            background-color: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .exercise-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .add-exercise-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(67, 97, 238, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .add-exercise-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(67, 97, 238, 0.4);
+        }
+
+        .exercise-item {
+            background-color: var(--light);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid var(--primary);
+        }
+
+        .muscle-group {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .muscle-chest {
+            background-color: var(--chest);
+        }
+
+        .muscle-back {
+            background-color: var(--back);
+        }
+
+        .muscle-legs {
+            background-color: var(--legs);
+        }
+
+        .muscle-shoulders {
+            background-color: var(--shoulders);
+        }
+
+        .muscle-arms {
+            background-color: var(--arms);
+        }
+
+        .muscle-cardio {
+            background-color: var(--cardio);
+        }
+
+        .exercise-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            font-size: 18px;
+            padding-right: 80px;
+        }
+
+        .exercise-details {
+            margin-bottom: 10px;
+        }
+
+        .warmup-set {
+            background-color: rgba(255, 193, 7, 0.2);
+            border-left: 3px solid var(--warning);
+        }
+
+        .set-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .set-item:last-child {
+            border-bottom: none;
+        }
+
+        .exercise-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: var(--dark);
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            opacity: 1;
+            color: var(--primary);
+        }
+
+        .delete-btn:hover {
+            color: var(--danger);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 12px;
+            padding: 20px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--dark);
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #f1f1f1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .exercise-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .sets-container {
+            margin-top: 15px;
+        }
+
+        .set-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: end;
+        }
+
+        .warmup-set-inputs {
+            background-color: rgba(255, 193, 7, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 3px solid var(--warning);
+        }
+
+        .add-set-btn, .remove-set-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--primary);
+            font-size: 14px;
+            padding: 5px;
+        }
+
+        .remove-set-btn {
+            color: var(--danger);
+        }
+
+        .warmup-check {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .submit-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 12px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background-color: var(--secondary);
+        }
+
+        .muscle-groups {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .muscle-group-btn {
+            padding: 8px 15px;
+            border-radius: 20px;
+            border: 1px solid #ddd;
+            background-color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .muscle-group-btn.active {
+            color: white;
+            border-color: transparent;
+        }
+
+        .muscle-group-btn.chest.active {
+            background-color: var(--chest);
+        }
+
+        .muscle-group-btn.back.active {
+            background-color: var(--back);
+        }
+
+        .muscle-group-btn.legs.active {
+            background-color: var(--legs);
+        }
+
+        .muscle-group-btn.shoulders.active {
+            background-color: var(--shoulders);
+        }
+
+        .muscle-group-btn.arms.active {
+            background-color: var(--arms);
+        }
+
+        .muscle-group-btn.cardio.active {
+            background-color: var(--cardio);
+        }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            background-color: var(--success);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 2000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .custom-exercise-toggle {
+            text-align: center;
+            margin: 10px 0;
+            color: var(--primary);
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        @media (max-width: 480px) {
+            .set-inputs {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <h1>Planer Antrenament</h1>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="week-navigation">
+            <button class="arrow" id="prev-week">&#9664;</button>
+            <div class="current-week" id="current-week">Săptămâna 25 Sep - 1 Oct</div>
+            <button class="arrow" id="next-week">&#9654;</button>
+        </div>
+
+        <div class="day-tabs" id="day-tabs">
+            <div class="day-tab active" data-day="luni">Luni</div>
+            <div class="day-tab" data-day="marti">Marți</div>
+            <div class="day-tab" data-day="miercuri">Miercuri</div>
+            <div class="day-tab" data-day="joi">Joi</div>
+            <div class="day-tab" data-day="vineri">Vineri</div>
+            <div class="day-tab" data-day="sambata">Sâmbătă</div>
+            <div class="day-tab" data-day="duminica">Duminică</div>
+        </div>
+
+        <div class="exercises-container">
+            <div class="exercise-header">
+                <h2 id="current-day">Luni</h2>
+                <button class="add-exercise-btn" id="add-exercise">+</button>
+            </div>
+
+            <div id="exercises-list">
+                <!-- Exercises will be added here dynamically -->
+            </div>
+        </div>
+
+        <div class="muscle-groups-container">
+            <h3>Grupe musculare pentru astăzi</h3>
+            <div class="muscle-groups" id="muscle-groups">
+                <button class="muscle-group-btn chest" data-muscle="chest">Piept</button>
+                <button class="muscle-group-btn back" data-muscle="back">Spate</button>
+                <button class="muscle-group-btn legs" data-muscle="legs">Picioare</button>
+                <button class="muscle-group-btn shoulders" data-muscle="shoulders">Umeri</button>
+                <button class="muscle-group-btn arms" data-muscle="arms">Bicepș/Tricepș</button>
+                <button class="muscle-group-btn cardio" data-muscle="cardio">Cardio</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for adding/editing exercises -->
+    <div class="modal" id="exercise-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-title">Adaugă exercițiu</h2>
+                <button class="close-modal" id="close-modal">&times;</button>
+            </div>
+            <form id="exercise-form">
+                <input type="hidden" id="exercise-id">
+                
+                <div class="form-group">
+                    <label for="exercise-name">Nume exercițiu</label>
+                    <input type="text" id="exercise-name" class="form-control" required>
+                    <select id="exercise-select" class="exercise-select">
+                        <!-- Options will be populated dynamically -->
+                    </select>
+                    <div class="custom-exercise-toggle" id="custom-exercise-toggle">+ Adaugă exercițiu personalizat</div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Grupa musculară</label>
+                    <div class="muscle-groups" id="modal-muscle-groups">
+                        <button type="button" class="muscle-group-btn chest" data-muscle="chest">Piept</button>
+                        <button type="button" class="muscle-group-btn back" data-muscle="back">Spate</button>
+                        <button type="button" class="muscle-group-btn legs" data-muscle="legs">Picioare</button>
+                        <button type="button" class="muscle-group-btn shoulders" data-muscle="shoulders">Umeri</button>
+                        <button type="button" class="muscle-group-btn arms" data-muscle="arms">Bicepș/Tricepș</button>
+                        <button type="button" class="muscle-group-btn cardio" data-muscle="cardio">Cardio</button>
+                    </div>
+                    <input type="hidden" id="muscle-group" required>
+                </div>
+                
+                <div class="warmup-check">
+                    <input type="checkbox" id="has-warmup">
+                    <label for="has-warmup">Include serie de încălzire</label>
+                </div>
+                
+                <div id="warmup-set-container" style="display: none;">
+                    <h4>Serie de încălzire</h4>
+                    <div class="warmup-set-inputs">
+                        <div class="set-inputs">
+                            <div class="form-group">
+                                <label>Greutate (kg)</label>
+                                <input type="number" class="form-control warmup-weight" min="0" step="0.5">
+                            </div>
+                            <div class="form-group">
+                                <label>Repetații</label>
+                                <input type="number" class="form-control warmup-reps" min="1">
+                            </div>
+                            <div></div> <!-- Empty div for alignment -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="sets-container" id="sets-container">
+                    <h4>Serii normale</h4>
+                    <div class="set-inputs">
+                        <div class="form-group">
+                            <label>Greutate (kg)</label>
+                            <input type="number" class="form-control set-weight" min="0" step="0.5" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Repetații</label>
+                            <input type="number" class="form-control set-reps" min="1" required>
+                        </div>
+                        <button type="button" class="remove-set-btn" style="display: none;">Șterge</button>
+                    </div>
+                </div>
+                
+                <button type="button" class="add-set-btn" id="add-set">+ Adaugă serie normală</button>
+                
+                <button type="submit" class="submit-btn">Salvează</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">Exercițiul a fost salvat cu succes!</div>
+
+    <footer>
+        <div class="container">
+            <p>Planerul tău de antrenament personal</p>
+        </div>
+    </footer>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const predefinedExercises = {
+        chest: ["Bench Press", "Incline Dumbbell Press", "Dumbbell Flyes", "Cable Crossovers", "Push-Ups", "Pec Deck"],
+        back: ["Pull-Ups", "Lat Pulldowns", "Bent Over Rows", "T-Bar Rows", "Seated Cable Rows", "Deadlifts"],
+        legs: ["Squats", "Leg Press", "Lunges", "Leg Extensions", "Romanian Deadlifts", "Calf Raises"],
+        shoulders: ["Overhead Press", "Lateral Raises", "Front Raises", "Upright Rows", "Reverse Flyes", "Shrugs"],
+        arms: ["Bicep Curls", "Hammer Curls", "Tricep Pushdowns", "Skull Crushers", "Preacher Curls", "Dips"],
+        cardio: ["Running", "Cycling", "Jumping Rope", "Rowing", "Elliptical", "Stair Climbing"]
+    };
+
+    let currentDate = new Date();
+    let currentDay = 'luni';
+    let selectedMuscleGroup = null;
+
+    const dayTabs = document.querySelectorAll('.day-tab');
+    const currentWeekElement = document.getElementById('current-week');
+    const currentDayElement = document.getElementById('current-day');
+    const exercisesList = document.getElementById('exercises-list');
+    const exerciseModal = document.getElementById('exercise-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const exerciseForm = document.getElementById('exercise-form');
+    const closeModalBtn = document.getElementById('close-modal');
+    const addExerciseBtn = document.getElementById('add-exercise');
+    const addSetBtn = document.getElementById('add-set');
+    const prevWeekBtn = document.getElementById('prev-week');
+    const nextWeekBtn = document.getElementById('next-week');
+    const muscleGroupButtonsMain = document.querySelectorAll('.muscle-group-btn');
+    const hasWarmupCheckbox = document.getElementById('has-warmup');
+    const warmupSetContainer = document.getElementById('warmup-set-container');
+    const notification = document.getElementById('notification');
+    const exerciseSelect = document.getElementById('exercise-select');
+    const exerciseNameInput = document.getElementById('exercise-name');
+    const customExerciseToggle = document.getElementById('custom-exercise-toggle');
+    const modalMuscleGroups = document.getElementById('modal-muscle-groups');
+    const setsContainer = document.getElementById('sets-container');
+    const exerciseIdInput = document.getElementById('exercise-id');
+
+    // Initializare
+    updateWeekDisplay();
+    loadDayExercises(currentDay);
+    loadMuscleGroupsForDay(currentDay);
+
+    // Event Listeners
+    dayTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            dayTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            currentDay = tab.getAttribute('data-day');
+            currentDayElement.textContent = capitalizeFirstLetter(currentDay);
+            loadDayExercises(currentDay);
+            loadMuscleGroupsForDay(currentDay);
+        });
+    });
+
+    muscleGroupButtonsMain.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const muscle = btn.getAttribute('data-muscle');
+            toggleMuscleGroupForDay(currentDay, muscle);
+            loadMuscleGroupsForDay(currentDay);
+        });
+    });
+
+    addExerciseBtn.addEventListener('click', () => openExerciseModal());
+    closeModalBtn.addEventListener('click', () => closeExerciseModal());
+    addSetBtn.addEventListener('click', () => addSetInput());
+    
+    exerciseForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        saveExercise();
+    });
+
+    prevWeekBtn.addEventListener('click', () => changeWeek(-1));
+    nextWeekBtn.addEventListener('click', () => changeWeek(1));
+
+    hasWarmupCheckbox.addEventListener('change', () => {
+        warmupSetContainer.style.display = hasWarmupCheckbox.checked ? 'block' : 'none';
+        const warmupWeight = document.querySelector('.warmup-weight');
+        const warmupReps = document.querySelector('.warmup-reps');
+        if (hasWarmupCheckbox.checked) {
+            warmupWeight.setAttribute('required', 'required');
+            warmupReps.setAttribute('required', 'required');
+        } else {
+            warmupWeight.removeAttribute('required');
+            warmupReps.removeAttribute('required');
+        }
+    });
+
+    customExerciseToggle.addEventListener('click', () => {
+        exerciseSelect.style.display = 'none';
+        exerciseNameInput.style.display = 'block';
+        customExerciseToggle.style.display = 'none';
+    });
+
+    modalMuscleGroups.querySelectorAll('.muscle-group-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            modalMuscleGroups.querySelectorAll('.muscle-group-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            selectedMuscleGroup = btn.getAttribute('data-muscle');
+            document.getElementById('muscle-group').value = selectedMuscleGroup;
+            populateExerciseSelect(selectedMuscleGroup);
+            exerciseNameInput.style.display = 'none';
+            exerciseSelect.style.display = 'block';
+            customExerciseToggle.style.display = 'block';
+        });
+    });
+
+    // Funcții de bază
+    function updateWeekDisplay() {
+        const startOfWeek = getStartOfWeek(currentDate);
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 6);
+        const options = { day: 'numeric', month: 'short' };
+        const startStr = startOfWeek.toLocaleDateString('ro-RO', options);
+        const endStr = endOfWeek.toLocaleDateString('ro-RO', options);
+        currentWeekElement.textContent = `Săptămâna ${startStr} - ${endStr}`;
+    }
+
+    function getStartOfWeek(date) {
+        const day = date.getDay();
+        const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+        return new Date(date.setDate(diff));
+    }
+
+    function changeWeek(weeks) {
+        currentDate.setDate(currentDate.getDate() + weeks * 7);
+        updateWeekDisplay();
+        loadDayExercises(currentDay);
+        loadMuscleGroupsForDay(currentDay);
+    }
+
+    function getWeekKey() {
+        const startOfWeek = getStartOfWeek(currentDate);
+        return startOfWeek.toISOString().slice(0, 10);
+    }
+    
+    function getDayData(weekKey, day) {
+        const data = JSON.parse(localStorage.getItem(weekKey)) || {};
+        if (!data[day]) {
+            data[day] = { exercises: [], muscles: [] };
+        }
+        return data[day];
+    }
+
+    function saveDayData(weekKey, day, dayData) {
+        const data = JSON.parse(localStorage.getItem(weekKey)) || {};
+        data[day] = dayData;
+        localStorage.setItem(weekKey, JSON.stringify(data));
+    }
+
+    function loadDayExercises(day) {
+        const weekKey = getWeekKey();
+        const dayData = getDayData(weekKey, day);
+        exercisesList.innerHTML = '';
+        if (dayData.exercises && dayData.exercises.length > 0) {
+            dayData.exercises.forEach((exercise, index) => {
+                const exerciseElement = createExerciseElement(exercise, index);
+                exercisesList.appendChild(exerciseElement);
+            });
+        } else {
+            exercisesList.innerHTML = '<p class="no-exercises">Nu ai exerciții pentru această zi. Apasă "+" pentru a adăuga.</p>';
+        }
+    }
+
+    function createExerciseElement(exercise, index) {
+        const exerciseEl = document.createElement('div');
+        exerciseEl.className = 'exercise-item';
+        const muscleGroupClass = `muscle-${exercise.muscleGroup}`;
+        let setsHTML = '';
+        let setCounter = 1;
+
+        if (exercise.hasWarmup && exercise.warmupSet) {
+            exerciseEl.classList.add('warmup-set');
+            setsHTML += `<div class="set-item"><span>Încălzire:</span><span>${exercise.warmupSet.weight} kg × ${exercise.warmupSet.reps} repetări</span></div>`;
+        }
+
+        exercise.sets.forEach(() => {
+            setsHTML += `<div class="set-item"><span>Serie ${setCounter}:</span><span>${exercise.sets[setCounter - 1].weight} kg × ${exercise.sets[setCounter - 1].reps} repetări</span></div>`;
+            setCounter++;
+        });
+
+        exerciseEl.innerHTML = `
+            <span class="muscle-group ${muscleGroupClass}">${getMuscleGroupName(exercise.muscleGroup)}</span>
+            <div class="exercise-title">${exercise.name}</div>
+            <div class="exercise-details">${setsHTML}</div>
+            <div class="exercise-actions">
+                <button class="action-btn edit-btn" data-index="${index}">✏️</button>
+                <button class="action-btn delete-btn" data-index="${index}">🗑️</button>
+            </div>
+        `;
+
+        exerciseEl.querySelector('.edit-btn').addEventListener('click', () => openExerciseModal(index));
+        exerciseEl.querySelector('.delete-btn').addEventListener('click', () => deleteExercise(index));
+        return exerciseEl;
+    }
+
+    function getMuscleGroupName(key) {
+        const names = {'chest': 'Piept', 'back': 'Spate', 'legs': 'Picioare', 'shoulders': 'Umeri', 'arms': 'Bicepș/Tricepș', 'cardio': 'Cardio'};
+        return names[key] || key;
+    }
+
+    function openExerciseModal(exerciseIndex = null) {
+        modalTitle.textContent = exerciseIndex !== null ? 'Editează exercițiu' : 'Adaugă exercițiu';
+        exerciseForm.reset();
+        exerciseIdInput.value = exerciseIndex;
+        warmupSetContainer.style.display = 'none';
+        hasWarmupCheckbox.checked = false;
+        
+        setsContainer.innerHTML = '<h4>Serii normale</h4>';
+        addSetInput();
+        
+        modalMuscleGroups.querySelectorAll('.muscle-group-btn').forEach(btn => btn.classList.remove('active'));
+        
+        exerciseNameInput.style.display = 'block';
+        exerciseSelect.style.display = 'none';
+        customExerciseToggle.style.display = 'block';
+        
+        if (exerciseIndex !== null) {
+            const weekKey = getWeekKey();
+            const dayData = getDayData(weekKey, currentDay);
+            const exercise = dayData.exercises[exerciseIndex];
+            
+            exerciseNameInput.value = exercise.name;
+            document.getElementById('muscle-group').value = exercise.muscleGroup;
+            
+            const muscleBtn = modalMuscleGroups.querySelector(`[data-muscle="${exercise.muscleGroup}"]`);
+            if (muscleBtn) muscleBtn.classList.add('active');
+            
+            if (exercise.hasWarmup) {
+                hasWarmupCheckbox.checked = true;
+                warmupSetContainer.style.display = 'block';
+                document.querySelector('.warmup-weight').value = exercise.warmupSet.weight;
+                document.querySelector('.warmup-reps').value = exercise.warmupSet.reps;
+            }
+            
+            setsContainer.innerHTML = '<h4>Serii normale</h4>';
+            exercise.sets.forEach(set => addSetInput(set.weight, set.reps));
+        }
+        exerciseModal.style.display = 'flex';
+    }
+
+    function closeExerciseModal() {
+        exerciseModal.style.display = 'none';
+        exerciseForm.reset();
+        exerciseIdInput.value = '';
+        selectedMuscleGroup = null;
+    }
+
+    function addSetInput(weight = '', reps = '') {
+        const setDiv = document.createElement('div');
+        setDiv.className = 'set-inputs';
+        setDiv.innerHTML = `
+            <div class="form-group">
+                <label>Greutate (kg)</label>
+                <input type="number" class="form-control set-weight" min="0" step="0.5" required value="${weight}">
+            </div>
+            <div class="form-group">
+                <label>Repetații</label>
+                <input type="number" class="form-control set-reps" min="1" required value="${reps}">
+            </div>
+            <button type="button" class="remove-set-btn">Șterge</button>
+        `;
+        setsContainer.appendChild(setDiv);
+        setDiv.querySelector('.remove-set-btn').addEventListener('click', () => setDiv.remove());
+    }
+
+    function saveExercise() {
+        const exerciseName = exerciseNameInput.style.display !== 'none' ? exerciseNameInput.value : exerciseSelect.value;
+        const muscleGroup = document.getElementById('muscle-group').value;
+        const hasWarmup = hasWarmupCheckbox.checked;
+        const exerciseId = exerciseIdInput.value;
+
+        if (!exerciseName || !muscleGroup) {
+            alert('Te rog completează numele exercițiului și grupa musculară.');
+            return;
+        }
+
+        const sets = [];
+        document.querySelectorAll('#sets-container .set-inputs').forEach(setDiv => {
+            const weight = parseFloat(setDiv.querySelector('.set-weight').value);
+            const reps = parseInt(setDiv.querySelector('.set-reps').value);
+            if (!isNaN(weight) && !isNaN(reps) && weight >= 0 && reps > 0) {
+                sets.push({ weight, reps });
+            }
+        });
+        
+        let warmupSet = null;
+        if (hasWarmup) {
+            const warmupWeight = parseFloat(document.querySelector('.warmup-weight').value);
+            const warmupReps = parseInt(document.querySelector('.warmup-reps').value);
+            if (!isNaN(warmupWeight) && !isNaN(warmupReps) && warmupWeight >= 0 && warmupReps > 0) {
+                warmupSet = { weight: warmupWeight, reps: warmupReps };
+            }
+        }
+        
+        const newExercise = {
+            name: exerciseName,
+            muscleGroup: muscleGroup,
+            hasWarmup: hasWarmup,
+            warmupSet: warmupSet,
+            sets: sets
+        };
+
+        const weekKey = getWeekKey();
+        const dayData = getDayData(weekKey, currentDay);
+
+        if (exerciseId === '') {
+            dayData.exercises.push(newExercise);
+        } else {
+            dayData.exercises[parseInt(exerciseId)] = newExercise;
+        }
+
+        saveDayData(weekKey, currentDay, dayData);
+        loadDayExercises(currentDay);
+        closeExerciseModal();
+        showNotification();
+    }
+
+    function deleteExercise(index) {
+        if (confirm('Ești sigur că vrei să ștergi acest exercițiu?')) {
+            const weekKey = getWeekKey();
+            const dayData = getDayData(weekKey, currentDay);
+            dayData.exercises.splice(index, 1);
+            saveDayData(weekKey, currentDay, dayData);
+            loadDayExercises(currentDay);
+            showNotification('Exercițiul a fost șters!');
+        }
+    }
+
+    function loadMuscleGroupsForDay(day) {
+        const weekKey = getWeekKey();
+        const dayData = getDayData(weekKey, day);
+        const activeMuscles = dayData.muscles || [];
+        document.querySelectorAll('#muscle-groups .muscle-group-btn').forEach(btn => {
+            const muscle = btn.getAttribute('data-muscle');
+            if (activeMuscles.includes(muscle)) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+    }
+
+    function toggleMuscleGroupForDay(day, muscle) {
+        const weekKey = getWeekKey();
+        const dayData = getDayData(weekKey, day);
+        const muscles = dayData.muscles || [];
+        const index = muscles.indexOf(muscle);
+        if (index > -1) {
+            muscles.splice(index, 1);
+        } else {
+            muscles.push(muscle);
+        }
+        dayData.muscles = muscles;
+        saveDayData(weekKey, day, dayData);
+    }
+
+    function capitalizeFirstLetter(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
+    function showNotification(message = 'Exercițiul a fost salvat cu succes!') {
+        notification.textContent = message;
+        notification.classList.add('show');
+        setTimeout(() => notification.classList.remove('show'), 3000);
+    }
+
+    function populateExerciseSelect(muscleGroup) {
+        exerciseSelect.innerHTML = '<option value="" disabled selected>Selectează un exercițiu...</option>';
+        if (predefinedExercises[muscleGroup]) {
+            predefinedExercises[muscleGroup].forEach(exercise => {
+                const option = document.createElement('option');
+                option.value = exercise;
+                option.textContent = exercise;
+                exerciseSelect.appendChild(option);
+            });
+        }
+    }
+});
+    </script>
+</body>
+</html>
