@@ -18,8 +18,9 @@
             --back: #4ecdc4;
             --legs: #1a936f;
             --shoulders: #ffd166;
-            --arms: #f28482;
-            --cardio: #9d4edd;
+            --biceps: #f28482;
+            --triceps: #9d4edd;
+            --forearm: #0650ee;
         }
 
         * {
@@ -182,12 +183,16 @@
             background-color: var(--shoulders);
         }
 
-        .muscle-arms {
-            background-color: var(--arms);
+        .muscle-biceps {
+            background-color: var(--biceps);
+        }
+        
+        .muscle-triceps {
+            background-color: var(--triceps);
         }
 
-        .muscle-cardio {
-            background-color: var(--cardio);
+        .muscle-forearm {
+            background-color: var(--forearm);
         }
 
         .exercise-title {
@@ -416,12 +421,15 @@
             background-color: var(--shoulders);
         }
 
-        .muscle-group-btn.arms.active {
-            background-color: var(--arms);
+        .muscle-group-btn.biceps.active {
+            background-color: var(--biceps);
         }
 
-        .muscle-group-btn.cardio.active {
-            background-color: var(--cardio);
+        .muscle-group-btn.triceps.active {
+            background-color: var(--triceps);
+        }
+        .muscle-group-btn.forearm.active {
+            background-color: var(--forearm);
         }
 
         footer {
@@ -502,8 +510,7 @@
             </div>
 
             <div id="exercises-list">
-                <!-- Exercises will be added here dynamically -->
-            </div>
+                </div>
         </div>
 
         <div class="muscle-groups-container">
@@ -513,13 +520,13 @@
                 <button class="muscle-group-btn back" data-muscle="back">Spate</button>
                 <button class="muscle-group-btn legs" data-muscle="legs">Picioare</button>
                 <button class="muscle-group-btn shoulders" data-muscle="shoulders">Umeri</button>
-                <button class="muscle-group-btn arms" data-muscle="arms">Bicepș/Tricepș</button>
-                <button class="muscle-group-btn cardio" data-muscle="cardio">Cardio</button>
+                <button class="muscle-group-btn biceps" data-muscle="biceps">Biceps</button>
+                <button class="muscle-group-btn triceps" data-muscle="triceps">Triceps</button>
+                <button class="muscle-group-btn forearm" data-muscle="forearm">Antebraț</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal for adding/editing exercises -->
     <div class="modal" id="exercise-modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -533,8 +540,7 @@
                     <label for="exercise-name">Nume exercițiu</label>
                     <input type="text" id="exercise-name" class="form-control" required>
                     <select id="exercise-select" class="exercise-select">
-                        <!-- Options will be populated dynamically -->
-                    </select>
+                        </select>
                     <div class="custom-exercise-toggle" id="custom-exercise-toggle">+ Adaugă exercițiu personalizat</div>
                 </div>
                 
@@ -545,8 +551,9 @@
                         <button type="button" class="muscle-group-btn back" data-muscle="back">Spate</button>
                         <button type="button" class="muscle-group-btn legs" data-muscle="legs">Picioare</button>
                         <button type="button" class="muscle-group-btn shoulders" data-muscle="shoulders">Umeri</button>
-                        <button type="button" class="muscle-group-btn arms" data-muscle="arms">Bicepș/Tricepș</button>
-                        <button type="button" class="muscle-group-btn cardio" data-muscle="cardio">Cardio</button>
+                        <button type="button" class="muscle-group-btn biceps" data-muscle="biceps">Biceps</button>
+                        <button type="button" class="muscle-group-btn triceps" data-muscle="triceps">Triceps</button>
+                        <button type="button" class="muscle-group-btn forearm" data-muscle="forearm">Antebraț</button>
                     </div>
                     <input type="hidden" id="muscle-group" required>
                 </div>
@@ -568,8 +575,7 @@
                                 <label>Repetații</label>
                                 <input type="number" class="form-control warmup-reps" min="1">
                             </div>
-                            <div></div> <!-- Empty div for alignment -->
-                        </div>
+                            <div></div> </div>
                     </div>
                 </div>
                 
@@ -606,12 +612,13 @@
     <script>
     document.addEventListener('DOMContentLoaded', function() {
     const predefinedExercises = {
-        chest: ["Bench Press", "Incline Dumbbell Press", "Dumbbell Flyes", "Cable Crossovers", "Push-Ups", "Pec Deck"],
-        back: ["Pull-Ups", "Lat Pulldowns", "Bent Over Rows", "T-Bar Rows", "Seated Cable Rows", "Deadlifts"],
+        chest: ["Împins oriontal bara dreapta", "Impins vertical la aparat", "Fluturari la aparat", "Împins la smith", "Împins la aparat plan orizontal", "Flexii la scripete"],
+        back: ["Ramat la aparat orizontal", "ramat la aparat vertical", "ramat la helcometru", "ramat orizontal", "Ramat la scripete"],
         legs: ["Squats", "Leg Press", "Lunges", "Leg Extensions", "Romanian Deadlifts", "Calf Raises"],
-        shoulders: ["Overhead Press", "Lateral Raises", "Front Raises", "Upright Rows", "Reverse Flyes", "Shrugs"],
-        arms: ["Bicep Curls", "Hammer Curls", "Tricep Pushdowns", "Skull Crushers", "Preacher Curls", "Dips"],
-        cardio: ["Running", "Cycling", "Jumping Rope", "Rowing", "Elliptical", "Stair Climbing"]
+        shoulders: ["impins la aparat lateral", "impins ala aparat vertical ", "ridicari laterale la gantere", "", "", ""],
+        biceps: ["flexii la aparat", "Ciocane la gantere", "Flexii la gantere din sezut", "Flexii la scripete", "flexii bara Z", "scufundari"],
+        triceps: ["Extensiila scripete", "Extensii deasupra capului cu gantera", "scufundar la aparat ", "extensii cu funia ", "Extensii cu bara deasupra capului", ""],
+        forearm: ["flexii la scripete ", "flexii cu bara ", "flexii la gantere spre interior", "flexii inverse la scripete cu spatele", "", ""]
     };
 
     let currentDate = new Date();
@@ -680,21 +687,14 @@
 
     hasWarmupCheckbox.addEventListener('change', () => {
         warmupSetContainer.style.display = hasWarmupCheckbox.checked ? 'block' : 'none';
-        const warmupWeight = document.querySelector('.warmup-weight');
-        const warmupReps = document.querySelector('.warmup-reps');
-        if (hasWarmupCheckbox.checked) {
-            warmupWeight.setAttribute('required', 'required');
-            warmupReps.setAttribute('required', 'required');
-        } else {
-            warmupWeight.removeAttribute('required');
-            warmupReps.removeAttribute('required');
-        }
     });
 
     customExerciseToggle.addEventListener('click', () => {
         exerciseSelect.style.display = 'none';
         exerciseNameInput.style.display = 'block';
         customExerciseToggle.style.display = 'none';
+        exerciseNameInput.required = true;
+        exerciseSelect.required = false;
     });
 
     modalMuscleGroups.querySelectorAll('.muscle-group-btn').forEach(btn => {
@@ -708,6 +708,8 @@
             exerciseNameInput.style.display = 'none';
             exerciseSelect.style.display = 'block';
             customExerciseToggle.style.display = 'block';
+            exerciseNameInput.required = false;
+            exerciseSelect.required = true;
         });
     });
 
@@ -780,8 +782,8 @@
             setsHTML += `<div class="set-item"><span>Încălzire:</span><span>${exercise.warmupSet.weight} kg × ${exercise.warmupSet.reps} repetări</span></div>`;
         }
 
-        exercise.sets.forEach(() => {
-            setsHTML += `<div class="set-item"><span>Serie ${setCounter}:</span><span>${exercise.sets[setCounter - 1].weight} kg × ${exercise.sets[setCounter - 1].reps} repetări</span></div>`;
+        exercise.sets.forEach(set => {
+            setsHTML += `<div class="set-item"><span>Serie ${setCounter}:</span><span>${set.weight} kg × ${set.reps} repetări</span></div>`;
             setCounter++;
         });
 
@@ -801,7 +803,7 @@
     }
 
     function getMuscleGroupName(key) {
-        const names = {'chest': 'Piept', 'back': 'Spate', 'legs': 'Picioare', 'shoulders': 'Umeri', 'arms': 'Bicepș/Tricepș', 'cardio': 'Cardio'};
+        const names = {'chest': 'Piept', 'back': 'Spate', 'legs': 'Picioare', 'shoulders': 'Umeri', 'biceps': 'Biceps', 'triceps': 'Triceps', 'forearm': 'Antebraț'};
         return names[key] || key;
     }
 
@@ -820,7 +822,9 @@
         exerciseNameInput.style.display = 'block';
         exerciseSelect.style.display = 'none';
         customExerciseToggle.style.display = 'block';
-        
+        exerciseNameInput.required = true;
+        exerciseSelect.required = false;
+
         if (exerciseIndex !== null) {
             const weekKey = getWeekKey();
             const dayData = getDayData(weekKey, currentDay);
@@ -868,6 +872,12 @@
         `;
         setsContainer.appendChild(setDiv);
         setDiv.querySelector('.remove-set-btn').addEventListener('click', () => setDiv.remove());
+
+        if (setsContainer.children.length > 2) {
+            document.querySelectorAll('.remove-set-btn').forEach(btn => btn.style.display = 'block');
+        } else {
+            document.querySelectorAll('.remove-set-btn').forEach(btn => btn.style.display = 'none');
+        }
     }
 
     function saveExercise() {
@@ -898,28 +908,37 @@
                 warmupSet = { weight: warmupWeight, reps: warmupReps };
             }
         }
-        
+
+        if (sets.length === 0) {
+            alert('Te rog adaugă cel puțin o serie normală.');
+            return;
+        }
+
         const newExercise = {
             name: exerciseName,
             muscleGroup: muscleGroup,
             hasWarmup: hasWarmup,
             warmupSet: warmupSet,
-            sets: sets
+            sets: sets,
+            id: exerciseId || new Date().getTime()
         };
 
         const weekKey = getWeekKey();
         const dayData = getDayData(weekKey, currentDay);
-
-        if (exerciseId === '') {
-            dayData.exercises.push(newExercise);
+        
+        if (exerciseId) {
+            const index = dayData.exercises.findIndex(e => e.id == exerciseId);
+            if (index !== -1) {
+                dayData.exercises[index] = newExercise;
+            }
         } else {
-            dayData.exercises[parseInt(exerciseId)] = newExercise;
+            dayData.exercises.push(newExercise);
         }
 
         saveDayData(weekKey, currentDay, dayData);
-        loadDayExercises(currentDay);
         closeExerciseModal();
-        showNotification();
+        loadDayExercises(currentDay);
+        showNotification('Exercițiul a fost salvat cu succes!');
     }
 
     function deleteExercise(index) {
@@ -936,10 +955,9 @@
     function loadMuscleGroupsForDay(day) {
         const weekKey = getWeekKey();
         const dayData = getDayData(weekKey, day);
-        const activeMuscles = dayData.muscles || [];
-        document.querySelectorAll('#muscle-groups .muscle-group-btn').forEach(btn => {
+        muscleGroupButtonsMain.forEach(btn => {
             const muscle = btn.getAttribute('data-muscle');
-            if (activeMuscles.includes(muscle)) {
+            if (dayData.muscles.includes(muscle)) {
                 btn.classList.add('active');
             } else {
                 btn.classList.remove('active');
@@ -950,39 +968,41 @@
     function toggleMuscleGroupForDay(day, muscle) {
         const weekKey = getWeekKey();
         const dayData = getDayData(weekKey, day);
-        const muscles = dayData.muscles || [];
-        const index = muscles.indexOf(muscle);
+        const index = dayData.muscles.indexOf(muscle);
         if (index > -1) {
-            muscles.splice(index, 1);
+            dayData.muscles.splice(index, 1);
         } else {
-            muscles.push(muscle);
+            dayData.muscles.push(muscle);
         }
-        dayData.muscles = muscles;
         saveDayData(weekKey, day, dayData);
+    }
+
+    function populateExerciseSelect(muscleGroup) {
+        const exercises = predefinedExercises[muscleGroup] || [];
+        exerciseSelect.innerHTML = '<option value="" disabled selected>Selectează un exercițiu</option>';
+        exercises.forEach(exercise => {
+            if (exercise) {
+                const option = document.createElement('option');
+                option.value = exercise;
+                option.textContent = exercise;
+                exerciseSelect.appendChild(option);
+            }
+        });
     }
 
     function capitalizeFirstLetter(string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
     }
-
-    function showNotification(message = 'Exercițiul a fost salvat cu succes!') {
+    
+    function showNotification(message) {
         notification.textContent = message;
         notification.classList.add('show');
-        setTimeout(() => notification.classList.remove('show'), 3000);
+        setTimeout(() => {
+            notification.classList.remove('show');
+        }, 3000);
     }
 
-    function populateExerciseSelect(muscleGroup) {
-        exerciseSelect.innerHTML = '<option value="" disabled selected>Selectează un exercițiu...</option>';
-        if (predefinedExercises[muscleGroup]) {
-            predefinedExercises[muscleGroup].forEach(exercise => {
-                const option = document.createElement('option');
-                option.value = exercise;
-                option.textContent = exercise;
-                exerciseSelect.appendChild(option);
-            });
-        }
-    }
-});
+    });
     </script>
 </body>
 </html>
